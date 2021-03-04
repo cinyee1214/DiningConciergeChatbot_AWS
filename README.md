@@ -8,7 +8,7 @@ This project is our assignment one for the course - Cloud Computing and Big Data
 This chatbot can recommend you restaurant suggestions based on your requirements such as City, Cuisine, Number of people, Date and Time. The bot uses the yelp API to fetch relevant suggestions and mails the suggestions on the emailId that the user provides.
 
 ## Teammates
-[Shen Lin, sl8180]()
+[Shen Lin, sl8180](https://github.com/alexxlin)
 
 [Xinyi Zhao, xz2833](https://github.com/cinyee1214) 
 
