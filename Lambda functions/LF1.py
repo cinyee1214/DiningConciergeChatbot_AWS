@@ -82,7 +82,7 @@ def delegate(session_attributes, slots):
 
 def sendSQSMessage(requestData):
     
-    print("sending SQS Message with request Data of")
+    print("Line 85: sending SQS Message with request Data of")
     print(requestData)
     
     sqs = boto3.client('sqs')
@@ -113,10 +113,11 @@ def sendSQSMessage(requestData):
             'DataType': 'Number',
             'StringValue': requestData['peoplenum']
         },
-        'EmailId': {
+        'Phone': {
             'DataType': 'String',
-            'StringValue': requestData['EmailId']
+            'StringValue': requestData['phone']
         }
+        
     }
     #mesAtrributes = json.dumps(messageAttributes)
     messageBody=('Slots for the Restaurant')
@@ -128,16 +129,18 @@ def sendSQSMessage(requestData):
         MessageAttributes = messageAttributes,
         MessageBody = messageBody
         )
+    
 
-    print("successfully sent out SQS message with response of ")
+    print("line 132: successfully sent out SQS message with messageAttributes of ")
     print(messageAttributes)
     print("The response is")
     print(response)
+    
     return response['MessageId']
     
 """ --- Intents --- """
 
-def validateIntentSlots(location, cuisine, num_people, date, time, email):
+def validateIntentSlots(location, cuisine, num_people, date, time, phoneNumber):
     """
     Perform basic validations to make sure that user has entered expected values for intent slots.
     """
@@ -149,12 +152,12 @@ def validateIntentSlots(location, cuisine, num_people, date, time, email):
                                        'Please enter a valid location'
                                        .format(location))
                                        
-    cuisines = ['chinese', 'american', 'indian', 'korean', 'japanese']
+    cuisines = ['chinese cuisine', 'american cuisine', 'indian cuisine', 'korean cuisine', 'japanese cuisine']
     if cuisine is not None and cuisine.lower() not in cuisines:
         return build_validation_result(False,
                                        'cuisine',
                                        'Sorry, we do not have suggestions for {}. '
-                                       'Please enter a valid cuisine, such as, Chinese, American, Indian, Korean, Japanese.'
+                                       'Please enter a valid cuisine, such as, Chinese cuisine, American cuisine, Indian cuisine, Korean cuisine, Japanese cuisine.'
                                        .format(cuisine))
     if date is not None:
         if not isvalid_date(date) or datetime.datetime.strptime(date, '%Y-%m-%d').date() < datetime.date.today():
@@ -202,12 +205,19 @@ def validateIntentSlots(location, cuisine, num_people, date, time, email):
     #         return build_validation_result(False, 'given_time', 'Not a valid time')
 
     
-        if email and '@' not in email:
-            return build_validation_result(
-                False,
-                'email',
-                'Sorry, {} is not a valid email address. Please provide a valid email address.'.format(email)
-            )
+        # if email and '@' not in email:
+        #     return build_validation_result(
+        #         False,
+        #         'email',
+        #         'Sorry, {} is not a valid email address. Please provide a valid email address.'.format(email)
+        #     )
+        
+        if phoneNumber is not None:
+            if not phoneNumber.isnumeric() or len(phoneNumber) != 10:
+                return build_validation_result(False,
+                                           'phone',
+                                           'Please enter a valid phone number.'.format(phoneNumber))    
+                                       
     print("function validateIntentSlots enters the final return statement")
     return build_validation_result(True, None, None)
 
@@ -222,7 +232,8 @@ def dining_suggestion_intent(intent_request):
     num_people = get_slots(intent_request)["num_people"]
     date = get_slots(intent_request)["date"]
     given_time = get_slots(intent_request)["given_time"]
-    emailId = get_slots(intent_request)["email"]
+    phone = get_slots(intent_request)["phone"]
+    
     session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
 
     requestData = {
@@ -233,7 +244,7 @@ def dining_suggestion_intent(intent_request):
                     "peoplenum": num_people,
                     "Date": date,
                     "Time": given_time,
-                    "EmailId": emailId
+                    "phone": phone
                 }
                 
     print(requestData)
@@ -243,7 +254,7 @@ def dining_suggestion_intent(intent_request):
     if intent_request['invocationSource'] == 'DialogCodeHook':
         slots = get_slots(intent_request)
         
-        validation_result = validateIntentSlots(location, cuisine, num_people, date, given_time, emailId)
+        validation_result = validateIntentSlots(location, cuisine, num_people, date, given_time, phone)
         # If validation fails, elicit the slot again 
         if not validation_result['isValid']:
             slots[validation_result['violatedSlot']] = None
@@ -260,7 +271,7 @@ def dining_suggestion_intent(intent_request):
     return close(intent_request['sessionAttributes'],
              'Fulfilled',
              {'contentType': 'PlainText',
-              'content': 'You are all set. Expect my suggestions shortly! We will send you the recommendations by email when they are generated.'})
+              'content': 'You are all set. Expect my suggestions shortly! We will send you the recommendations by text when they are generated.'})
 
 def dispatch(intent_request):
     """
