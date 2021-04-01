@@ -18,5 +18,5 @@ The frontend is hosted in AWS S3 and provides an user interface to interact with
 ## Backend (Python 3.8)
 The frontend is implemented by AWS Lambda functions/Lex/SQS/ElasticSearch/DynamoDB/SES.
 
-## Architechture
+## Architecture
 ![](/Architechture.png)
