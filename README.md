@@ -1,6 +1,6 @@
 # **Dining Concierge Chatbot**
 ## About
-This project is our assignment one for the course - Cloud Computing and Big Data (CS-GY 9223, New York University).
+This project is lab one of course - Cloud Computing and Big Data (CS-GY 9223, New York University).
 
 "Dining Concierge Chatbot" is a serverless, microservice driven web-based application. It is an intelligent natural language powered chatbot that is designed using multiple AWS components, such as: S3-Buckets, AWS Lex,  APIGateway, Lambda Functions, SQS, Cloud Watch, ElasticSearch, DynamoDB and SES.
 
